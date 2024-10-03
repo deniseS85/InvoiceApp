@@ -11,32 +11,19 @@ using iText.Layout.Properties;
 
 namespace RechnungsApp.Views
 {
-    public partial class InvoicePopup : ContentPage
+    public partial class InvoicePDF : ContentPage
     {
-        public InvoicePopup(string address, string total)
+        private string previewAdress;
+        private string baseImponible;
+        private string iva;
+        private string previewTotal;
+        public InvoicePDF(string address, string total)
         {
             InitializeComponent();
-            PreviewAddress.Text = address;
-
-            var formattedDateString = new FormattedString();
-            formattedDateString.Spans.Add(new Span 
-            {
-                Text = DateTime.Now.ToString("dd/MM/yyyy"),
-                FontAttributes = FontAttributes.Bold,
-                FontSize = 15,
-            });
-          /*   PreviewDate.FormattedText = formattedDateString; */
-
-            /* var formattedString = new FormattedString();
-            formattedString.Spans.Add(new Span 
-            {
-                Text = total,
-                FontAttributes = FontAttributes.Bold,
-                FontSize = 15
-            });
-
-            PreviewTotal.FormattedText = formattedString; */
-            PreviewTotal.Text = total;
+            previewAdress = address;
+            previewTotal = total;
+            baseImponible = string.Empty;
+            iva = string.Empty;
             CalculateValues(total);
         }
 
@@ -45,18 +32,17 @@ namespace RechnungsApp.Views
             string cleanedTotal = total.Replace(" €", "").Replace(",", ".");
                                                    
             if (decimal.TryParse(cleanedTotal, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal totalValue))  
-            // CultureInfo.InvariantCulture: Komma wird als Dezimaltrennzeichen richtig interpretiert
-            // NumberStyles.Any: akzeptiert verschiedene Zahlenformate
             {
-                decimal baseImponible = totalValue / 1.10m; // m: Kennzeichen für Dezimal
-                decimal iva = baseImponible * 0.10m;
+                decimal baseImponibleValue = totalValue / 1.10m;
+                decimal ivaValue = baseImponibleValue * 0.10m;
 
-                BaseImponibleLabel.Text = $"{baseImponible:F2} €"; // F2: 2 Dezimalstellen
-                IvaLabel.Text = $"{iva:F2} €";
-            } else
+                baseImponible = $"{baseImponibleValue:F2} €";
+                iva = $"{ivaValue:F2} €";
+            } 
+            else
             {
-                BaseImponibleLabel.Text = string.Empty;
-                IvaLabel.Text = string.Empty;
+                baseImponible = string.Empty;
+                iva = string.Empty;
             }
         }
 
@@ -71,7 +57,7 @@ namespace RechnungsApp.Views
             await DisplayAlert("Info", "Rechnung wird gedruckt!", "OK");
         }
 
-        private async void OnGeneratePdfClicked(object sender, EventArgs e)
+        public async void OnGeneratePdfClicked(object sender, EventArgs e)
         {           
             using MemoryStream memoryStream = new();
             try
@@ -137,7 +123,7 @@ namespace RechnungsApp.Views
                     document.Add(ls);
 
                     // Empfänger Adresse
-                    document.Add(new Paragraph(PreviewAddress.Text).SetFontSize(13));
+                    document.Add(new Paragraph(previewAdress).SetFontSize(13));
 
                     // Rechnungsnummer
                     document.Add(new Paragraph("Número de factura: 23/2024")
@@ -165,7 +151,7 @@ namespace RechnungsApp.Views
                     baseImponibleCell.SetBorder(iText.Layout.Borders.Border.NO_BORDER);
                     table.AddCell(baseImponibleCell);
 
-                    var baseImponibleText = new iTextCell().Add(new Paragraph(BaseImponibleLabel.Text).SetTextAlignment(iText.Layout.Properties.TextAlignment.RIGHT).SetPaddingTop(5).SetPaddingBottom(5));
+                    var baseImponibleText = new iTextCell().Add(new Paragraph(baseImponible).SetTextAlignment(iText.Layout.Properties.TextAlignment.RIGHT).SetPaddingTop(5).SetPaddingBottom(5));
                     baseImponibleText.SetBorder(iText.Layout.Borders.Border.NO_BORDER);
                     table.AddCell(baseImponibleText);
 
@@ -174,7 +160,7 @@ namespace RechnungsApp.Views
                     ivaCell.SetBorder(iText.Layout.Borders.Border.NO_BORDER);
                     table.AddCell(ivaCell);
 
-                    var ivaText = new iTextCell().Add(new Paragraph(IvaLabel.Text).SetTextAlignment(iText.Layout.Properties.TextAlignment.RIGHT).SetPaddingBottom(5)).SetBorderBottom(new SolidBorder(new DeviceRgb(17, 119, 176), 2));
+                    var ivaText = new iTextCell().Add(new Paragraph(iva).SetTextAlignment(iText.Layout.Properties.TextAlignment.RIGHT).SetPaddingBottom(5)).SetBorderBottom(new SolidBorder(new DeviceRgb(17, 119, 176), 2));
                     ivaText.SetBorder(iText.Layout.Borders.Border.NO_BORDER);
                     table.AddCell(ivaText);
 
@@ -183,7 +169,7 @@ namespace RechnungsApp.Views
                     totalBillCell.SetBorder(iText.Layout.Borders.Border.NO_BORDER);
                     table.AddCell(totalBillCell);
 
-                    var totalBillText = new iTextCell().Add(new Paragraph(PreviewTotal.Text).SetBold().SetFontSize(14).SetTextAlignment(iText.Layout.Properties.TextAlignment.RIGHT).SetPaddingTop(3).SetPaddingBottom(3)).SetBorderBottom(new DoubleBorder(new DeviceRgb(17, 119, 176), 4));
+                    var totalBillText = new iTextCell().Add(new Paragraph(previewTotal).SetBold().SetFontSize(14).SetTextAlignment(iText.Layout.Properties.TextAlignment.RIGHT).SetPaddingTop(3).SetPaddingBottom(3)).SetBorderBottom(new DoubleBorder(new DeviceRgb(17, 119, 176), 4));
                     totalBillText.SetBorder(iText.Layout.Borders.Border.NO_BORDER);
                     table.AddCell(totalBillText);
 
@@ -197,8 +183,9 @@ namespace RechnungsApp.Views
                     // Stempel und Unterschrift
                     var stamp_sign = await ConvertImageSourceToStreamAsync("stamp_sign.png");
                     document.Add(new iText.Layout.Element.Image(ImageDataFactory.Create(stamp_sign)).SetHorizontalAlignment(iText.Layout.Properties.HorizontalAlignment.LEFT).SetWidth(180).SetMarginTop(8));
+
+                    document.Close();
                 }
-                
                 // PDF-Daten im MemoryStream abrufen
                 byte[] pdfData = memoryStream.ToArray();
 

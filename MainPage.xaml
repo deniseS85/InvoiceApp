@@ -24,6 +24,7 @@
 
             <!-- Adressbuttons  -->
             <FlexLayout
+                x:Name="ButtonContainer"
                 Direction="Row"
                 JustifyContent="SpaceEvenly"
                 AlignItems="Center"
@@ -44,9 +45,10 @@
                     WidthRequest="200" 
                     Margin="5" />
 
-                <Button 
+                <Button
+                    x:Name="newCustomerButton" 
                     Text="Neue Adresse hinzufügen" 
-                    Clicked="OnAddNewAddress" 
+                    Clicked="OnCustomerButtonClicked" 
                     WidthRequest="200" 
                     Margin="5" />
             </FlexLayout>

@@ -19,53 +19,67 @@ public partial class MainPage : ContentPage
 
 	private void OnCustomerButtonClicked(object sender, EventArgs e)
     {
-        // Überprüfen, welcher Button geklickt wurde
+
         Button clickedButton = (Button)sender;
         string customerName = clickedButton.Text;
 
         if (selectedCustomerName == customerName)
+        {
+            foreach (var button in ButtonContainer.Children.OfType<Button>())
             {
-                clickedButton.BackgroundColor = Color.FromArgb("#ac99ea");
-                selectedCustomerName = null;
-                return;
+                button.BackgroundColor = Color.FromArgb("#ac99ea");
             }
 
-        // Suche den Kunden in der Service-Klasse
+            selectedCustomerName = null;
+            return;
+        }
+
+        foreach (var button in ButtonContainer.Children.OfType<Button>())
+        {
+            if (button != clickedButton)
+            {
+                button.BackgroundColor = Color.FromArgb("#50FFFFFF");
+            }
+        }
+
+        clickedButton.BackgroundColor = Color.FromArgb("#52ceff");
+
         var selectedCustomer = customerService.GetCustomers()
-        .FirstOrDefault(c => c.Name != null && c.Name.StartsWith(customerName));
+            .FirstOrDefault(c => c.Name != null && c.Name.StartsWith(customerName));
 
         if (selectedCustomer != null)
         {
-            if (selectedCustomerName != null)
+            if (selectedCustomerName != null && selectedCustomerName != customerName)
+            {
+                var previousButton = GetButtonByCustomerName(selectedCustomerName);
+                if (previousButton != null)
                 {
-                    var previousButton = GetButtonByCustomerName(selectedCustomerName);
-                    if (previousButton != null)
-                    {
-                        previousButton.BackgroundColor = Color.FromArgb("#ac99ea");
-                    }
+                    previousButton.BackgroundColor = Color.FromArgb("#50FFFFFF");
                 }
-                selectedCustomerName = customerName;
-                clickedButton.BackgroundColor = Color.FromArgb("#52ceff");
-        } else
+            }
+            selectedCustomerName = customerName;
+        }
+        else
         {
-            DisplayAlert("Fehler", "Kunde nicht gefunden.", "OK");
+            OnAddNewAddress(sender, e);
         }
     }
 
-     private Button? GetButtonByCustomerName(string customerName)
+    private Button? GetButtonByCustomerName(string customerName)
     {
-        // Suche den Button anhand des Kundennamens
         return customerName switch
         {
             "INMEDIA STUDIOS" => customer1Button,
             "Notario" => customer2Button,
+            "Neue Adresse hinzufügen" => newCustomerButton,
             _ => null,
         };
     }
 
-    private void OnAddNewAddress(object sender, EventArgs e)
+   private async void OnAddNewAddress(object sender, EventArgs e)
     {
-        // Logik zum Hinzufügen einer neuen Adresse hier implementieren
+        var addNewAdress = new NewAdressForm();
+        await Navigation.PushModalAsync(addNewAdress);
     }
 
 
@@ -76,13 +90,14 @@ public partial class MainPage : ContentPage
 
         if (selectedCustomer != null)
         {
-            string address = $"{selectedCustomer.Name}\n{selectedCustomer.Address}\n{selectedCustomer.PostalCode} {selectedCustomer.City}\nCIF {selectedCustomer.CIF}";
 
+            string address = $"{selectedCustomer.Name}\n{selectedCustomer.Address}\n{selectedCustomer.PostalCode} {selectedCustomer.City}\nCIF {selectedCustomer.CIF}";
             string wholeNumberText = WholeNumberEntry.Text ?? "0";
-            string decimalText = DecimalEntry.Text ?? "00";
+            string decimalText = string.IsNullOrEmpty(DecimalEntry.Text) ? "00" : DecimalEntry.Text;
 
             if (decimal.TryParse(wholeNumberText, out decimal wholeNumber) && decimal.TryParse(decimalText, out decimal decimalPart))
             {
+              
                 decimal totalValue = wholeNumber + (decimalPart / 100);
 
                 if (totalValue == 0)
@@ -92,7 +107,8 @@ public partial class MainPage : ContentPage
                 }
 
                 string total = $"{totalValue:C}";
-                OnShowInvoicePopup(address, total);
+ 
+                ShowInvoicePDF(address, total);
                 ResetForm();
             }
         }
@@ -101,6 +117,7 @@ public partial class MainPage : ContentPage
             DisplayAlert("Fehler", "Bitte wähle eine Adresse aus.", "OK");
         }
     }
+    
 
     private void OnlyNumberValid(object sender, TextChangedEventArgs e)
     {
@@ -113,26 +130,23 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private async void OnShowInvoicePopup(string address, string total)
+    private async void ShowInvoicePDF(string address, string total)
     {
-        var invoicePopup = new InvoicePopup(address, total);
-        await Navigation.PushModalAsync(invoicePopup);
+        var invoicePDF = new InvoicePDF(address, total);
+        invoicePDF.OnGeneratePdfClicked(this, EventArgs.Empty);
+        await Navigation.PushModalAsync(invoicePDF);
     }
 
-    private void ResetForm()
+    public void ResetForm()
     {
         WholeNumberEntry.Text = string.Empty;
         DecimalEntry.Text = string.Empty;
         WholeNumberEntry.Unfocus();
         DecimalEntry.Unfocus();
 
-        if (selectedCustomerName != null)
+        foreach (var button in ButtonContainer.Children.OfType<Button>())
         {
-            var previousButton = GetButtonByCustomerName(selectedCustomerName);
-            if (previousButton != null)
-            {
-                previousButton.BackgroundColor = Color.FromArgb("#ac99ea");
-            }
+            button.BackgroundColor = Color.FromArgb("#ac99ea");
         }
         selectedCustomerName = null;
     }

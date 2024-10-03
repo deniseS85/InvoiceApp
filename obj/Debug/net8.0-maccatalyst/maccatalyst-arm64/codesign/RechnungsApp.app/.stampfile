@@ -1,1 +1,0 @@
--v --force --timestamp=none --sign - --entitlements /Users/denisesiegl/Projekte/RechnungsApp/obj/Debug/net8.0-maccatalyst/maccatalyst-arm64/Entitlements.xcent /Users/denisesiegl/Projekte/RechnungsApp/bin/Debug/net8.0-maccatalyst/maccatalyst-arm64/RechnungsApp.app

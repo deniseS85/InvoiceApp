@@ -13,13 +13,16 @@ namespace RechnungsApp.Views
 {
     public partial class InvoicePDF : ContentPage
     {
-        private string previewAdress;
+        private readonly string previewAdress;
         private string baseImponible;
         private string iva;
-        private string previewTotal;
-        public InvoicePDF(string address, string total)
+        private readonly string previewTotal;
+        private readonly MainPage? _mainPage;
+
+        public InvoicePDF(MainPage mainPage, string address, string total)
         {
             InitializeComponent();
+            _mainPage = mainPage;
             previewAdress = address;
             previewTotal = total;
             baseImponible = string.Empty;
@@ -49,6 +52,7 @@ namespace RechnungsApp.Views
         private async void OnCloseButtonClicked(object sender, EventArgs e)
         {
             await Navigation.PopModalAsync();
+            _mainPage?.ResetForm();
         }
 
         private async void OnPrintClicked(object sender, EventArgs e)

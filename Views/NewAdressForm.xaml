@@ -64,9 +64,9 @@
 
                     <Button 
                         Text="Speichern" 
-                        
+                        Clicked="OnAddCustomer" 
                         WidthRequest="200" 
-                        Margin="5" /> <!-- Clicked="OnAddCustomer" -->
+                        Margin="5" />
 
                      <Button 
                         Text="Schließen"  

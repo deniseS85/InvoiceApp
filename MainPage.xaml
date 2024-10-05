@@ -1,109 +1,125 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:RechnungsApp.Views"
              x:Class="RechnungsApp.MainPage">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="30,0" Spacing="25">
-            <Image
-                Source="invoice.png"
-                HeightRequest="185"
-                Aspect="AspectFit"
-                SemanticProperties.Description="Invoice Image"
-                Margin="0,30,0,0" />
-            <Label
-                Text="RechnungsApp"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" /> <!-- Level1: H1, Level2: H2,... -->
+    <AbsoluteLayout>
+        <ScrollView AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                        AbsoluteLayout.LayoutFlags="All">
+            <VerticalStackLayout Padding="30,0" Spacing="25">
+                <Image
+                    Source="invoice.png"
+                    HeightRequest="185"
+                    Aspect="AspectFit"
+                    SemanticProperties.Description="Invoice Image"
+                    Margin="0,30,0,0" />
+                <Label
+                    Text="RechnungsApp"
+                    Style="{StaticResource Headline}"
+                    SemanticProperties.HeadingLevel="Level1" /> <!-- Level1: H1, Level2: H2,... -->
 
-            <Label 
-                Text="1. Wähle die Adresse aus:" 
-                FontSize="20" 
-                TextColor="White"
-                HorizontalOptions="Center"/>
+                <Label 
+                    Text="1. Wähle die Adresse aus:" 
+                    FontSize="20" 
+                    TextColor="White"
+                    HorizontalOptions="Center"/>
 
-            <!-- Adressbuttons  -->
-            <FlexLayout
-                x:Name="ButtonContainer"
-                Direction="Row"
-                JustifyContent="SpaceEvenly"
-                AlignItems="Center"
-                Wrap="Wrap"
-                Padding="10">
+                <!-- Adressbuttons  -->
+                <FlexLayout
+                    x:Name="ButtonContainer"
+                    Direction="Row"
+                    JustifyContent="SpaceEvenly"
+                    AlignItems="Center"
+                    Wrap="Wrap"
+                    Padding="10">
 
-                <Button 
-                    x:Name="customer1Button" 
-                    Text="INMEDIA STUDIOS" 
-                    Clicked="OnCustomerButtonClicked" 
-                    WidthRequest="200" 
-                    Margin="5" />
+                    <Button 
+                        x:Name="customer1Button" 
+                        Text="INMEDIA STUDIOS" 
+                        Clicked="OnCustomerButtonClicked" 
+                        WidthRequest="200" 
+                        Margin="5" />
 
-                <Button 
-                    x:Name="customer2Button" 
-                    Text="Notario" 
-                    Clicked="OnCustomerButtonClicked" 
-                    WidthRequest="200" 
-                    Margin="5" />
+                    <Button 
+                        x:Name="customer2Button" 
+                        Text="Notario" 
+                        Clicked="OnCustomerButtonClicked" 
+                        WidthRequest="200" 
+                        Margin="5" />
 
+                    <Button
+                        x:Name="newCustomerButton" 
+                        Text="Neue Adresse hinzufügen" 
+                        Clicked="OnCustomerButtonClicked" 
+                        WidthRequest="200" 
+                        Margin="5" />
+                </FlexLayout>
+
+                <Label 
+                    Text="2. Gebe die Rechnungssumme ein:" 
+                    FontSize="20" 
+                    TextColor="White"
+                    HorizontalOptions="Center"/>
+
+                <HorizontalStackLayout 
+                    Spacing="5" 
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Center">
+                    
+                    <Entry 
+                        x:Name="WholeNumberEntry" 
+                        Placeholder="0" 
+                        Keyboard="Numeric"
+                        WidthRequest="80"
+                        VerticalOptions="Center"
+                        TextChanged="OnlyNumberValid"/>
+
+                    <Label 
+                        Text="," 
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Center"
+                        FontSize="20"/>
+
+                    <Entry 
+                        x:Name="DecimalEntry" 
+                        Placeholder="00" 
+                        Keyboard="Numeric"
+                        WidthRequest="80" 
+                        MaxLength="2"
+                        VerticalOptions="Center"
+                        TextChanged="OnlyNumberValid"/>
+
+                    <Label 
+                        Text="€" 
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Center"
+                        FontSize="20"/>
+                </HorizontalStackLayout>
+
+                <!-- Button zum Generieren der Rechnung -->
                 <Button
-                    x:Name="newCustomerButton" 
-                    Text="Neue Adresse hinzufügen" 
-                    Clicked="OnCustomerButtonClicked" 
-                    WidthRequest="200" 
-                    Margin="5" />
-            </FlexLayout>
+                    x:Name="CreateInvoiceBtn"
+                    Text="Rechnung erstellen" 
+                    SemanticProperties.Hint="Create Invoice for client"
+                    Clicked="OnCreateInvoice"
+                    HorizontalOptions="Fill" />
 
-            <Label 
-                Text="2. Gebe die Rechnungssumme ein:" 
-                FontSize="20" 
-                TextColor="White"
-                HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </ScrollView>
 
-            <HorizontalStackLayout 
-                Spacing="5" 
-                VerticalOptions="Center" 
-                HorizontalOptions="Center">
-                
-                <Entry 
-                    x:Name="WholeNumberEntry" 
-                    Placeholder="0" 
-                    Keyboard="Numeric"
-                    WidthRequest="80"
-                    VerticalOptions="Center"
-                    TextChanged="OnlyNumberValid"/>
+        <Frame x:Name="Overlay" 
+               BackgroundColor="Black" 
+               Opacity="0" 
+               IsVisible="False" 
+               AbsoluteLayout.LayoutBounds="0, 0, 1, 1" 
+               AbsoluteLayout.LayoutFlags="All" />
 
-                <Label 
-                    Text="," 
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Center"
-                    FontSize="20"/>
-
-                <Entry 
-                    x:Name="DecimalEntry" 
-                    Placeholder="00" 
-                    Keyboard="Numeric"
-                    WidthRequest="80" 
-                    MaxLength="2"
-                    VerticalOptions="Center"
-                    TextChanged="OnlyNumberValid"/>
-
-                <Label 
-                    Text="€" 
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Center"
-                    FontSize="20"/>
-            </HorizontalStackLayout>
-
-            <!-- Button zum Generieren der Rechnung -->
-            <Button
-                x:Name="CreateInvoiceBtn"
-                Text="Rechnung erstellen" 
-                SemanticProperties.Hint="Create Invoice for client"
-                Clicked="OnCreateInvoice"
-                HorizontalOptions="Fill" />
-        </VerticalStackLayout>
-    </ScrollView>
-
+        <local:Popup 
+            x:Name="CustomPopup" 
+            AbsoluteLayout.LayoutBounds="0.5, 0.5, AutoSize, AutoSize" 
+            AbsoluteLayout.LayoutFlags="PositionProportional" />
+    </AbsoluteLayout>
 </ContentPage>
 
 

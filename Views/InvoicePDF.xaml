@@ -16,6 +16,16 @@
                 HeightRequest="877" 
                 WidthRequest="620"/>
 
+            <Image
+                Source="share.png"
+                HeightRequest="50"
+                Aspect="AspectFit"
+                SemanticProperties.Description="Share Invoice">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnSharePDFClicked" />
+                </Image.GestureRecognizers>
+            </Image>
+
             <Button 
                 Text="Schließen"  
                 Clicked="OnCloseButtonClicked" 

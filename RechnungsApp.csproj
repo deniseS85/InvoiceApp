@@ -57,6 +57,7 @@
 		
 	</ItemGroup>
 
+
 	<ItemGroup>
 		<PackageReference Include="itext.bouncy-castle-adapter" Version="8.0.5" />
 		<PackageReference Include="itext7" Version="8.0.5" />
@@ -64,5 +65,5 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
 	</ItemGroup>
-
+	
 </Project>

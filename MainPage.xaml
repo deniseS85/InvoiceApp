@@ -2,12 +2,17 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:RechnungsApp.Views"
-             x:Class="RechnungsApp.MainPage">
+             x:Class="RechnungsApp.MainPage"
+             SizeChanged="OnPageSizeChanged">
 
     <AbsoluteLayout>
         <ScrollView AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
-                        AbsoluteLayout.LayoutFlags="All">
-            <VerticalStackLayout Padding="30,0" Spacing="25">
+                    AbsoluteLayout.LayoutFlags="All">
+            <VerticalStackLayout 
+                x:Name="MainContent" 
+                VerticalOptions="FillAndExpand" 
+                HorizontalOptions="FillAndExpand"
+                Spacing="25">
                 <Image
                     Source="invoice.png"
                     HeightRequest="185"
@@ -15,15 +20,21 @@
                     SemanticProperties.Description="Invoice Image"
                     Margin="0,30,0,0" />
                 <Label
+                    x:Name="HeaderLabel" 
                     Text="RechnungsApp"
                     Style="{StaticResource Headline}"
-                    SemanticProperties.HeadingLevel="Level1" /> <!-- Level1: H1, Level2: H2,... -->
+                    SemanticProperties.HeadingLevel="Level1" 
+                    LineBreakMode="WordWrap"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"/>
 
                 <Label 
                     Text="1. Wähle die Adresse aus:" 
-                    FontSize="20" 
                     TextColor="White"
-                    HorizontalOptions="Center"/>
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HorizontalTextAlignment="Center"
+                    FontSize="20"/>
 
                 <!-- Adressbuttons  -->
                 <FlexLayout
@@ -57,10 +68,13 @@
                 </FlexLayout>
 
                 <Label 
+                    x:Name="InvoiceSumLabel"
                     Text="2. Gebe die Rechnungssumme ein:" 
-                    FontSize="20" 
                     TextColor="White"
-                    HorizontalOptions="Center"/>
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HorizontalTextAlignment="Center"
+                    FontSize="20"/>
 
                 <HorizontalStackLayout 
                     Spacing="5" 
@@ -103,7 +117,7 @@
                     Text="Rechnung erstellen" 
                     SemanticProperties.Hint="Create Invoice for client"
                     Clicked="OnCreateInvoice"
-                    HorizontalOptions="Fill" />
+                    HorizontalOptions="Fill"  />
 
             </VerticalStackLayout>
         </ScrollView>

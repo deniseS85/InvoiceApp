@@ -144,6 +144,34 @@ public partial class MainPage : ContentPage {
         await Overlay.FadeTo(0, 100);
         Overlay.IsVisible = false;
     }
+
+    private void OnPageSizeChanged(object sender, EventArgs e) {
+        double newWidth = this.Width * 0.5;
+        MainContent.WidthRequest = newWidth;
+
+        double dynamicHeightButtons = 35;
+
+        if (newWidth <= 429.5) {
+            dynamicHeightButtons = 160; 
+        } else if (newWidth <= 649) {
+            dynamicHeightButtons = 98;
+        }
+      
+        ButtonContainer.HeightRequest = dynamicHeightButtons + 20;
+
+       /*  double fontSizeHeader = Clamp(newWidth / 10, 24, 32);
+        HeaderLabel.FontSize = fontSizeHeader;
+ */
+       /*  double fontSizeSubHeader = Clamp(newWidth / 10, 16, 20);
+        FirstSubHeaderLabel.FontSize = fontSizeSubHeader;
+        InvoiceSumLabel.FontSize = fontSizeSubHeader; */
+
+
+    }
+
+    /* private double Clamp(double value, double min, double max) {
+        return Math.Max(min, Math.Min(value, max));
+    } */
 }
 
 

@@ -8,67 +8,108 @@ using iTextCell = iText.Layout.Element.Cell;
 using iText.Layout.Borders;
 using iText.Kernel.Pdf.Canvas.Draw;
 using iText.Layout.Properties;
+using System.Diagnostics;
+using System.Net.NetworkInformation;
 
-namespace RechnungsApp.Views
-{
-    public partial class InvoicePDF : ContentPage
-    {
+
+namespace RechnungsApp.Views {
+    public partial class InvoicePDF : ContentPage {
         private readonly string previewAdress;
         private string baseImponible;
         private string iva;
         private readonly string previewTotal;
         private readonly MainPage? _mainPage;
+        private static int _invoiceNumber = 0;
+        private static int currentYear; 
 
-        public InvoicePDF(MainPage mainPage, string address, string total)
-        {
+        private readonly string filePath = Path.Combine(FileSystem.AppDataDirectory, "invoiceNumber.txt");
+
+        public InvoicePDF(MainPage mainPage, string address, string total) {
             InitializeComponent();
             _mainPage = mainPage;
             previewAdress = address;
             previewTotal = total;
             baseImponible = string.Empty;
             iva = string.Empty;
+            LoadInvoiceNumber();
             CalculateValues(total);
         }
 
-        private void CalculateValues(string total)
-        {
+        private void LoadInvoiceNumber() {
+           currentYear = DateTime.Now.Year;
+
+            if (!File.Exists(filePath)) {
+                _invoiceNumber = 1;
+                SaveInvoiceNumber(currentYear);
+            } else {
+                string savedData = File.ReadAllText(filePath);
+                string[] parts = savedData.Split('/');
+
+                if (parts.Length == 2 &&
+                    int.TryParse(parts[0], out int savedYear) &&
+                    int.TryParse(parts[1], out int savedInvoiceNumber)) {
+
+                    if (savedYear != currentYear) {
+                        _invoiceNumber = 1;
+                        SaveInvoiceNumber(currentYear);
+                    } else {
+                        _invoiceNumber = savedInvoiceNumber + 1;
+                    }
+                } else {
+                    _invoiceNumber = 1;
+                    SaveInvoiceNumber(currentYear);
+                }
+            }
+        }
+                // zum öffnen der invoiceNumber.txt im Terminal eingeben:
+                // code /Users/denisesiegl/Library/Containers/com.companyname.rechnungsapp/Data/Library/invoiceNumber.txt
+        
+        
+        private void SaveInvoiceNumber(int year) {
+            File.WriteAllText(filePath, $"{year}/{_invoiceNumber}");
+        } 
+
+        private void CalculateValues(string total) {
             string cleanedTotal = total.Replace(" €", "").Replace(",", ".");
                                                    
-            if (decimal.TryParse(cleanedTotal, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal totalValue))  
-            {
+            if (decimal.TryParse(cleanedTotal, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal totalValue)) {
                 decimal baseImponibleValue = totalValue / 1.10m;
                 decimal ivaValue = baseImponibleValue * 0.10m;
 
                 baseImponible = $"{baseImponibleValue:F2} €";
                 iva = $"{ivaValue:F2} €";
             } 
-            else
-            {
+            else {
                 baseImponible = string.Empty;
                 iva = string.Empty;
             }
         }
 
-        private async void OnCloseButtonClicked(object sender, EventArgs e)
-        {
+        private async void OnCloseButtonClicked(object sender, EventArgs e) {
             await Navigation.PopModalAsync();
             _mainPage?.ResetForm();
         }
 
-        private async void OnPrintClicked(object sender, EventArgs e)
-        {
-            // Hier die Logik zum Drucken der Rechnung einfügen
-            await DisplayAlert("Info", "Rechnung wird gedruckt!", "OK");
+       private async void OnSharePDFClicked(object sender, EventArgs e) {
+            string fileName = "factura_rias_atenea.pdf";
+            string filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
+
+            if (!File.Exists(filePath)) {
+                await DisplayAlert("Fehler", "Die Rechnung existiert nicht.", "OK");
+                return;
+            }
+
+            await Share.Default.RequestAsync(new ShareFileRequest
+            {
+                File = new ShareFile(filePath)
+            });
         }
 
-        public async void OnGeneratePdfClicked(object sender, EventArgs e)
-        {           
+        public async void OnGeneratePdfClicked(object sender, EventArgs e) {           
             using MemoryStream memoryStream = new();
-            try
-            {
+            try {
                 using PdfWriter writer = new(memoryStream);
-                using (var pdf = new PdfDocument(writer))
-                {
+                using (var pdf = new PdfDocument(writer)) {
                     Document document = new(pdf);
 
                     // Bild hinzufügen
@@ -130,11 +171,16 @@ namespace RechnungsApp.Views
                     document.Add(new Paragraph(previewAdress).SetFontSize(13));
 
                     // Rechnungsnummer
-                    document.Add(new Paragraph("Número de factura: 23/2024")
-                        .SetBold().SetFontSize(14)
+                    int currentYear = DateTime.Now.Year;
+                    document.Add(new Paragraph($"Número de factura: {_invoiceNumber}/{currentYear}")
+                        .SetBold()
+                        .SetFontSize(14)
                         .SetFontColor(new DeviceRgb(17, 119, 176))
                         .SetMarginTop(15)
                         .SetMarginBottom(13));
+
+                    _invoiceNumber++;
+                    SaveInvoiceNumber(currentYear);
 
                     // Rechnungs Tabelle
                     float[] pointColumnWidths = [1, 1];
@@ -195,23 +241,20 @@ namespace RechnungsApp.Views
 
                 DisplayPdfPreview(pdfData);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                await DisplayAlert("Fehler", "Fehler beim Erstellen des PDFs: " + ex.Message, "OK");
             }
         }
 
-        private async Task<byte[]> ConvertImageSourceToStreamAsync(string imageName)
-        {
+        private async Task<byte[]> ConvertImageSourceToStreamAsync(string imageName) {
             using var ms = new MemoryStream();
             using (var stream = await FileSystem.OpenAppPackageFileAsync(imageName))
             await stream.CopyToAsync(ms);
             return ms.ToArray();
         }
 
-        private void DisplayPdfPreview(byte[] pdfData)
-        {
-            string fileName = "generated.pdf";
+        private void DisplayPdfPreview(byte[] pdfData) {
+            string fileName = "factura_rias_atenea.pdf";
             string localFilePath = Path.Combine(FileSystem.CacheDirectory, fileName);
 
             // PDF-Daten in eine lokale Datei schreiben
@@ -221,5 +264,4 @@ namespace RechnungsApp.Views
             PdfWebView.Source = new UrlWebViewSource { Url = localFilePath };
         }
     }
-
 }

@@ -1,80 +1,95 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:RechnungsApp.Views"
              x:Class="RechnungsApp.Views.NewAdressForm"
              Title="Rechnungsübersicht">
     
-    <ScrollView>
-
-        <Frame 
-            Padding="10" 
-            BorderColor="Black" 
-            BackgroundColor="#2A2A2A"
-            CornerRadius="10" 
-            HasShadow="True"
-            HeightRequest="800"
-            WidthRequest="620" >
-            
-            <VerticalStackLayout>
-
-                <Image
-                    Source="form_image.png"
-                    WidthRequest="120" 
-                    Aspect="AspectFit"
-                    SemanticProperties.Description="Logo Image"
-                    Margin="0, 30, 0, 30"/>
-
-                <Label
-                    Text="Gebe die neue Adresse ein:"
-                    Style="{StaticResource Headline}"
-                    SemanticProperties.HeadingLevel="Level6" />
-
-                <Entry 
-                    Placeholder="Name" Text="{Binding Customer.Name}" 
-                    HorizontalOptions="FillAndExpand"
-                    Margin="30" />
-
-                <Entry 
-                    Placeholder="Straße" Text="{Binding Customer.Address}" 
-                    HorizontalOptions="FillAndExpand"
-                    Margin="30,0"/>
-
-                <Entry 
-                    Placeholder="Postleitzahl" Text="{Binding Customer.PostalCode}" 
-                    HorizontalOptions="FillAndExpand"
-                     Margin="30"/>
-
-                <Entry 
-                    Placeholder="Stadt" Text="{Binding Customer.City}" 
-                    HorizontalOptions="FillAndExpand"
-                    Margin="30,0" />
-
-                <Entry 
-                    Placeholder="CIF" Text="{Binding Customer.CIF}" 
-                    HorizontalOptions="FillAndExpand"
-                    Margin="30" />
-
+    <AbsoluteLayout>
+        <ScrollView AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                    AbsoluteLayout.LayoutFlags="All">
+            <Frame 
+                Padding="10" 
+                BorderColor="Black" 
+                BackgroundColor="#2A2A2A"
+                CornerRadius="10" 
+                HasShadow="True"
+                HeightRequest="800"
+                WidthRequest="620" >
                 
-                <FlexLayout
-                    Direction="Row"
-                    JustifyContent="SpaceEvenly"
-                    AlignItems="Center"
-                    Wrap="Wrap"
-                    Padding="10"
-                    Margin="20">
+                <VerticalStackLayout>
 
-                    <Button 
-                        Text="Speichern" 
-                        Clicked="OnAddCustomer" 
-                        WidthRequest="200" 
-                        Margin="5" />
+                    <Image
+                        Source="form_image.png"
+                        WidthRequest="120" 
+                        Aspect="AspectFit"
+                        SemanticProperties.Description="Logo Image"
+                        Margin="0, 30, 0, 30"/>
 
-                     <Button 
-                        Text="Schließen"  
-                        Clicked="OnCloseButtonClicked" 
-                        WidthRequest="200"
-                        Margin="5"/>
-                </FlexLayout>
-            </VerticalStackLayout>
-        </Frame>
-    </ScrollView>
+                    <Label
+                        Text="Gebe die neue Adresse ein:"
+                        Style="{StaticResource Headline}"
+                        SemanticProperties.HeadingLevel="Level6" />
+
+                    <Entry 
+                        Placeholder="Name" Text="{Binding Customer.Name}" 
+                        HorizontalOptions="FillAndExpand"
+                        Margin="30" />
+
+                    <Entry 
+                        Placeholder="Straße" Text="{Binding Customer.Address}" 
+                        HorizontalOptions="FillAndExpand"
+                        Margin="30,0"/>
+
+                    <Entry 
+                        Placeholder="Postleitzahl" Text="{Binding Customer.PostalCode}" 
+                        HorizontalOptions="FillAndExpand"
+                        Margin="30"/>
+
+                    <Entry 
+                        Placeholder="Stadt" Text="{Binding Customer.City}" 
+                        HorizontalOptions="FillAndExpand"
+                        Margin="30,0" />
+
+                    <Entry 
+                        Placeholder="CIF" Text="{Binding Customer.CIF}" 
+                        HorizontalOptions="FillAndExpand"
+                        Margin="30" />
+
+                    
+                    <FlexLayout
+                        Direction="Row"
+                        JustifyContent="SpaceEvenly"
+                        AlignItems="Center"
+                        Wrap="Wrap"
+                        Padding="10"
+                        Margin="20">
+
+                        <Button 
+                            Text="Speichern" 
+                            Clicked="OnAddCustomer" 
+                            WidthRequest="200" 
+                            Margin="5" />
+
+                        <Button 
+                            Text="Schließen"  
+                            Clicked="OnCloseButtonClicked" 
+                            WidthRequest="200"
+                            Margin="5"/>
+                    </FlexLayout>
+                </VerticalStackLayout>
+            </Frame>
+        </ScrollView>
+
+        <Frame x:Name="Overlay" 
+            BackgroundColor="Black" 
+            Opacity="0" 
+            IsVisible="False" 
+            AbsoluteLayout.LayoutBounds="0, 0, 1, 1" 
+            AbsoluteLayout.LayoutFlags="All" />
+
+            <local:Popup 
+            x:Name="CustomPopup" 
+            AbsoluteLayout.LayoutBounds="0.5, 0.5, AutoSize, AutoSize" 
+            AbsoluteLayout.LayoutFlags="PositionProportional" />
+    </AbsoluteLayout>
 </ContentPage>

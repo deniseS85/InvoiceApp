@@ -1,4 +1,4 @@
-using System.ComponentModel; // Füge dies hinzu
+using System.ComponentModel;
 
 namespace RechnungsApp.Views {
     public partial class Popup : ContentView, INotifyPropertyChanged {

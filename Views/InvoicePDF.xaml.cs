@@ -11,7 +11,6 @@ using iText.Layout.Properties;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 
-
 namespace RechnungsApp.Views {
     public partial class InvoicePDF : ContentPage {
         private readonly string previewAdress;
@@ -33,6 +32,7 @@ namespace RechnungsApp.Views {
             iva = string.Empty;
             LoadInvoiceNumber();
             CalculateValues(total);
+            PdfWebView.SizeChanged += PdfWebView_SizeChanged;
         }
 
         private void LoadInvoiceNumber() {
@@ -262,6 +262,15 @@ namespace RechnungsApp.Views {
 
             // PDF im WebView anzeigen
             PdfWebView.Source = new UrlWebViewSource { Url = localFilePath };
+            PdfWebView.SizeChanged += PdfWebView_SizeChanged;
+        }
+
+        private void PdfWebView_SizeChanged(object? sender, EventArgs e) {
+            if (sender is WebView webView) {
+                double pdfWidth = webView.Width;
+                double pdfHeight = (pdfWidth * 877) / 620;
+                webView.HeightRequest = pdfHeight;
+            }
         }
     }
 }

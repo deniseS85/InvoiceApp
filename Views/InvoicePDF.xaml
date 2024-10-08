@@ -4,17 +4,15 @@
              x:Class="RechnungsApp.Views.InvoicePDF"
              Title="Rechnungsübersicht">
 
-    <ScrollView>
+    <ScrollView >
         <VerticalStackLayout
-            Padding="20"
-            Spacing="20"
-            VerticalOptions="CenterAndExpand"
-            HorizontalOptions="CenterAndExpand">
+            Padding="20,0"
+            Spacing="20">
 
             <WebView 
-                x:Name="PdfWebView" 
+                x:Name="PdfWebView"
                 HeightRequest="877" 
-                WidthRequest="620"/>
+                MaximumWidthRequest="620"/>
 
             <Image
                 Source="share.png"

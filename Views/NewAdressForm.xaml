@@ -13,8 +13,7 @@
                 BackgroundColor="#2A2A2A"
                 CornerRadius="10" 
                 HasShadow="True"
-                HeightRequest="800"
-                WidthRequest="620" >
+                MaximumWidthRequest="620">
                 
                 <VerticalStackLayout>
 

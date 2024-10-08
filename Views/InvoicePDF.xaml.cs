@@ -53,7 +53,7 @@ namespace RechnungsApp.Views {
                         _invoiceNumber = 1;
                         SaveInvoiceNumber(currentYear);
                     } else {
-                        _invoiceNumber = savedInvoiceNumber + 1;
+                        _invoiceNumber = savedInvoiceNumber;
                     }
                 } else {
                     _invoiceNumber = 1;
